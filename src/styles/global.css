@@ -648,13 +648,6 @@ input, textarea, select {
   color: var(--info);
 }
 
-.stat-card-value {
-  font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text);
-}
-
 /* atividade recente */
 .activity-panel {
   padding: var(--space-5);
@@ -724,6 +717,7 @@ input, textarea, select {
     text-align: left;
   }
 }
+
 /* responsáveis */
 .responsavel-header {
   display: flex;
@@ -1244,6 +1238,11 @@ input, textarea, select {
   border: none;
   padding: 0;
 }
+
+.card-details:hover {
+  color: var(--accent);
+}
+
 /* modal de detalhes / edição de projeto */
 .detalhes-modal {
   background: var(--surface-raised);
@@ -1414,10 +1413,6 @@ input, textarea, select {
   }
 }
 
-.card-details:hover {
-  color: var(--accent);
-}
-
 @media (max-width: 720px) {
   .projeto-card-v2 {
     flex-direction: column;
@@ -1431,7 +1426,6 @@ input, textarea, select {
     justify-content: space-between;
   }
 }
-
 
 /* tabela de projetos */
 .table-wrap {
@@ -1518,7 +1512,7 @@ input, textarea, select {
   }
 }
 
-/* lista de projetos */
+/* lista de projetos (legado, ainda referenciado por meta-sep) */
 .projeto-list {
   display: flex;
   flex-direction: column;
@@ -1568,7 +1562,71 @@ input, textarea, select {
   flex-shrink: 0;
 }
 
+@media (max-width: 640px) {
+  .projeto-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .projeto-card-actions {
+    align-self: flex-end;
+  }
+}
 
+/* login */
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+
+.login-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #171200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 32px rgba(254, 200, 23, 0.35);
+}
+
+.login-card {
+  width: 380px;
+  max-width: 92vw;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.login-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.login-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: -8px;
+  margin-bottom: var(--space-2);
+}
+
+.login-card .field input {
+  text-align: left;
+}
+
+.login-submit {
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-2);
+}
 
 /* modal */
 .modal-overlay {
@@ -1622,17 +1680,6 @@ input, textarea, select {
 .btn-danger-solid:hover {
   background: #ff8074;
 }
-
-@media (max-width: 640px) {
-  .projeto-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .projeto-card-actions {
-    align-self: flex-end;
-  }
-}
-
 
 /* barra superior */
 .topbar {
@@ -1898,6 +1945,7 @@ input, textarea, select {
     border-color: rgba(254, 200, 23, 0.3);
   }
 }
+
 /* =========================================================
    Dropdown customizado (substitui <select> nativo)
    O menu aberto usa os tokens de tema escuro, diferente do
