@@ -1,11 +1,29 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import {
+  Search, X, SlidersHorizontal, ArrowUpDown, List, LayoutGrid,
+  Layers, Code2, CircleHelp, Wrench, Circle, User, Calendar, ChevronRight, Trash2
+} from 'lucide-react'
 import { excluirProjeto, listarProjetos } from '../api/client'
 import { CATEGORIAS, STATUS, labelCategoria, labelStatus } from '../constants'
 import ConfirmModal from '../components/ConfirmModal.jsx'
 import { useToast } from '../components/ToastContext.jsx'
 
 const PAGE_SIZE = 8
+
+const CATEGORIA_ICONS = {
+  INFRAESTRUTURA: Layers,
+  DESENVOLVIMENTO: Code2,
+  SUPORTE: CircleHelp,
+  MANUTENCAO: Wrench,
+  OUTROS: Circle
+}
+
+const SORT_OPTIONS = [
+  { value: 'dataAtualizacao,desc', label: 'Mais recentes' },
+  { value: 'dataAtualizacao,asc', label: 'Mais antigas' },
+  { value: 'titulo,asc', label: 'Título A-Z' }
+]
 
 export default function PainelProjetos() {
   const { push } = useToast()
@@ -19,6 +37,11 @@ export default function PainelProjetos() {
   const [busca, setBusca] = useState('')
   const [status, setStatus] = useState('')
   const [categoria, setCategoria] = useState('')
+  const [sort, setSort] = useState('dataAtualizacao,desc')
+  const [view, setView] = useState('list')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+
+  const filtrosAtivos = Boolean(busca || status || categoria)
 
   const filtros = useMemo(() => ({
     titulo: busca || undefined,
@@ -26,8 +49,8 @@ export default function PainelProjetos() {
     categoria: categoria || undefined,
     page,
     size: PAGE_SIZE,
-    sort: 'dataCriacao,desc'
-  }), [busca, status, categoria, page])
+    sort
+  }), [busca, status, categoria, page, sort])
 
   async function carregar() {
     setLoading(true)
@@ -50,7 +73,13 @@ export default function PainelProjetos() {
 
   useEffect(() => {
     setPage(0)
-  }, [busca, status, categoria])
+  }, [busca, status, categoria, sort])
+
+  function limparFiltros() {
+    setBusca('')
+    setStatus('')
+    setCategoria('')
+  }
 
   async function confirmarExclusao() {
     try {
@@ -68,41 +97,124 @@ export default function PainelProjetos() {
       <div className="page-header">
         <div>
           <h1>Painel de Projetos</h1>
-          <p>Visualize, filtre e gerencie o status de todos os projetos cadastrados.</p>
+          <p>Visualize, filtre e gerencie todos os projetos cadastrados.</p>
         </div>
       </div>
 
-      <div className="panel-toolbar">
-        <div className="results-count">
-          <span>▤</span> {totalElements} projeto{totalElements === 1 ? '' : 's'}
-        </div>
-        <div className="toolbar-filters">
+      <div className="search-row">
+        <div className="search-box">
+          <Search size={16} className="search-icon" />
           <input
-            className="search-input"
             placeholder="Buscar por título..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
-          <select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="">Todos os status</option>
-            {STATUS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
-          <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-            <option value="">Todas as categorias</option>
-            {CATEGORIAS.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
+          {busca && (
+            <button className="search-clear" onClick={() => setBusca('')} aria-label="Limpar busca">
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        <button
+          className={`icon-toggle ${filtersOpen ? 'icon-toggle-active' : ''}`}
+          onClick={() => setFiltersOpen((v) => !v)}
+          aria-label="Filtros"
+          title="Filtros"
+        >
+          <SlidersHorizontal size={16} />
+        </button>
+
+        <div className="sort-control">
+          <ArrowUpDown size={14} />
+          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
         </div>
+
+        <div className="view-toggle">
+          <button
+            className={view === 'list' ? 'active' : ''}
+            onClick={() => setView('list')}
+            aria-label="Visualização em lista"
+            title="Lista"
+          >
+            <List size={16} />
+          </button>
+          <button
+            className={view === 'grid' ? 'active' : ''}
+            onClick={() => setView('grid')}
+            aria-label="Visualização em grade"
+            title="Grade"
+          >
+            <LayoutGrid size={16} />
+          </button>
+        </div>
+      </div>
+
+      {filtersOpen && (
+        <div className="corner-frame filter-panel">
+          <div className="filter-group">
+            <span className="filter-group-label">Status</span>
+            <div className="pill-row">
+              <button className={`pill ${status === '' ? 'pill-active' : ''}`} onClick={() => setStatus('')}>
+                Todos
+              </button>
+              {STATUS.map((s) => (
+                <button
+                  key={s.value}
+                  className={`pill ${status === s.value ? 'pill-active' : ''}`}
+                  onClick={() => setStatus(s.value)}
+                >
+                  <span className={`pill-dot dot-${s.value.toLowerCase()}`} />
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <span className="filter-group-label">Categoria</span>
+            <div className="pill-row">
+              <button className={`pill ${categoria === '' ? 'pill-active' : ''}`} onClick={() => setCategoria('')}>
+                Todas
+              </button>
+              {CATEGORIAS.map((c) => {
+                const Icon = CATEGORIA_ICONS[c.value]
+                return (
+                  <button
+                    key={c.value}
+                    className={`pill ${categoria === c.value ? 'pill-active' : ''}`}
+                    onClick={() => setCategoria(c.value)}
+                  >
+                    <Icon size={13} />
+                    {c.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="results-row">
+        <span className="results-count">
+          <List size={14} /> {totalElements} projeto{totalElements === 1 ? '' : 's'}
+        </span>
+        {filtrosAtivos && (
+          <button className="reset-filters" onClick={limparFiltros}>
+            ‹ ver todos
+          </button>
+        )}
       </div>
 
       {loading && <p className="empty-hint">Carregando projetos...</p>}
 
       {!loading && projetos.length === 0 && (
         <div className="corner-frame empty-state">
-          <div className="empty-icon">▤</div>
+          <div className="empty-icon"><Search size={20} /></div>
           <h3>Nenhum projeto encontrado</h3>
           <p>Ajuste os filtros ou registre um novo projeto para visualizá-lo aqui.</p>
           <Link className="btn btn-primary" to="/novo-projeto">Criar novo projeto</Link>
@@ -110,43 +222,48 @@ export default function PainelProjetos() {
       )}
 
       {!loading && projetos.length > 0 && (
-        <div className="table-wrap corner-frame">
-          <table className="data-table">
-  <thead>
-    <tr>
-      <th>Projeto</th>
-      <th>Categoria</th>
-      <th>Responsável</th>
-      <th>Criado em</th>
-      <th>Atualizado em</th>
-      <th>Status</th>
-      <th aria-label="Ações"></th>
-    </tr>
-  </thead>
-  <tbody>
-    {projetos.map((p) => (
-      <tr key={p.id}>
-        <td data-label="Projeto">
-          <span className="table-title">{p.titulo}</span>
-        </td>
-        <td data-label="Categoria">{labelCategoria(p.categoria)}</td>
-        <td data-label="Responsável">{p.responsavelNome}</td>
-        <td data-label="Criado em"><span className="meta-date">{formatarData(p.dataCriacao)}</span></td>
-        <td data-label="Atualizado em"><span className="meta-date">{formatarData(p.dataAtualizacao)}</span></td>
-        <td data-label="Status">
-          <span className={`status-badge status-${p.status.toLowerCase()}`}>
-            <span className="dot" />
-            {labelStatus(p.status)}
-          </span>
-        </td>
-        <td data-label="Ações" className="table-actions">
-          <Link className="btn btn-icon" to={`/projetos/${p.id}/editar`} title="Editar">✎</Link>
-          <button className="btn btn-icon" onClick={() => setPendingDelete(p)} title="Excluir">✕</button>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+        <div className={`projeto-collection projeto-collection-${view}`}>
+          {projetos.map((p) => {
+            const CategoriaIcon = CATEGORIA_ICONS[p.categoria]
+            return (
+              <div key={p.id} className="corner-frame projeto-card-v2">
+                <span className={`card-dot dot-${p.status.toLowerCase()}`} />
+                <div className="card-body">
+                  <h3 className="card-title" title={p.titulo}>{p.titulo}</h3>
+                  {p.descricao && <p className="card-desc">{p.descricao}</p>}
+
+                  <div className="card-tags">
+                    <span className="tag-pill">
+                      <CategoriaIcon size={13} /> {labelCategoria(p.categoria)}
+                    </span>
+                    <span className={`status-badge status-${p.status.toLowerCase()}`}>
+                      <span className="dot" />
+                      {labelStatus(p.status)}
+                    </span>
+                  </div>
+
+                  <div className="card-meta">
+                    <span><User size={12} /> {p.responsavelNome}</span>
+                    <span><Calendar size={12} /> {formatarData(p.dataCriacao)}</span>
+                  </div>
+                </div>
+
+                <div className="card-actions">
+                  <button
+                    className="btn btn-icon"
+                    onClick={() => setPendingDelete(p)}
+                    title="Excluir"
+                    aria-label="Excluir projeto"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  <Link className="card-details" to={`/projetos/${p.id}/editar`}>
+                    Detalhes <ChevronRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
 
@@ -177,6 +294,5 @@ export default function PainelProjetos() {
 
 function formatarData(iso) {
   if (!iso) return ''
-  const date = new Date(iso)
-  return date.toLocaleDateString('pt-BR')
+  return new Date(iso).toLocaleDateString('pt-BR')
 }

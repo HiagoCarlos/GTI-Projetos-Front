@@ -5,7 +5,7 @@ import NovoProjeto from './pages/NovoProjeto.jsx'
 import EditarProjeto from './pages/EditarProjeto.jsx'
 import PainelProjetos from './pages/PainelProjetos.jsx'
 import Responsaveis from './pages/Responsaveis.jsx'
-import Indicadores from './pages/Indicadores.jsx'
+import Dashboard from './pages/dashboard.jsx'
 
 export default function App() {
   return (
@@ -14,7 +14,7 @@ export default function App() {
         <Topbar />
         <main className="app-content">
           <Routes>
-            <Route path="/" element={<Indicadores />} />
+            <Route path="/" element={<Dashboard />} />
             <Route path="/novo-projeto" element={<NovoProjeto />} />
             <Route path="/painel" element={<PainelProjetos />} />
             <Route path="/projetos/:id/editar" element={<EditarProjeto />} />
