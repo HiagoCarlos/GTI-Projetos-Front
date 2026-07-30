@@ -8,6 +8,7 @@ import { excluirProjeto, listarProjetos } from '../api/client'
 import { CATEGORIAS, STATUS, labelCategoria, labelStatus } from '../constants'
 import ConfirmModal from '../components/ConfirmModal.jsx'
 import { useToast } from '../components/ToastContext.jsx'
+import ProjetoDetalhesModal from '../components/ProjetoDetalhesModal.jsx'
 
 const PAGE_SIZE = 8
 
@@ -33,7 +34,7 @@ export default function PainelProjetos() {
   const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
   const [pendingDelete, setPendingDelete] = useState(null)
-
+  const [detalhesId, setDetalhesId] = useState(null)
   const [busca, setBusca] = useState('')
   const [status, setStatus] = useState('')
   const [categoria, setCategoria] = useState('')
@@ -257,9 +258,9 @@ export default function PainelProjetos() {
                   >
                     <Trash2 size={14} />
                   </button>
-                  <Link className="card-details" to={`/projetos/${p.id}/editar`}>
-                    Detalhes <ChevronRight size={14} />
-                  </Link>
+                  <button className="card-details" onClick={() => setDetalhesId(p.id)}>
+                 Detalhes <ChevronRight size={14} />
+                  </button>
                 </div>
               </div>
             )
@@ -286,8 +287,17 @@ export default function PainelProjetos() {
           confirmLabel="Excluir"
           onConfirm={confirmarExclusao}
           onCancel={() => setPendingDelete(null)}
+
+          
         />
       )}
+      {detalhesId && (
+  <ProjetoDetalhesModal
+    projetoId={detalhesId}
+    onClose={() => setDetalhesId(null)}
+    onChanged={carregar}
+  />
+)}
     </>
   )
 }
