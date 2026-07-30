@@ -6,6 +6,7 @@ import {
 import { atualizarProjeto, buscarProjeto, excluirProjeto, listarResponsaveis } from '../api/client'
 import { CATEGORIAS, STATUS, labelCategoria } from '../constants'
 import ConfirmModal from './ConfirmModal.jsx'
+import Dropdown from './Dropdown.jsx'
 import { useToast } from './ToastContext.jsx'
 
 const CATEGORIA_ICONS = {
@@ -132,17 +133,14 @@ export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) 
 
             <div className="detalhes-status-row">
               <span className="detalhes-status-label">Status atual</span>
-              <div className={`status-select-pill status-${projeto.status.toLowerCase()}`}>
-                <StatusIcon size={13} />
-                <select
-                  value={projeto.status}
-                  onChange={(e) => handleStatusRapido(e.target.value)}
-                >
-                  {STATUS.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                  ))}
-                </select>
-              </div>
+              <Dropdown
+                variant="pill"
+                className={`status-${projeto.status.toLowerCase()}`}
+                icon={StatusIcon}
+                value={projeto.status}
+                onChange={handleStatusRapido}
+                options={STATUS}
+              />
             </div>
 
             <div className="detalhes-block">
@@ -197,44 +195,35 @@ export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) 
             <div className="form-row">
               <div className="field">
                 <label>Responsável</label>
-                <select
+                <Dropdown
+                  variant="field"
+                  placeholder="Selecione um responsável"
                   value={form.responsavelId}
-                  onChange={(e) => setForm({ ...form, responsavelId: e.target.value })}
-                >
-                  {responsaveis.map((r) => (
-                    <option key={r.id} value={r.id}>{r.nome}</option>
-                  ))}
-                </select>
+                  onChange={(v) => setForm({ ...form, responsavelId: v })}
+                  options={responsaveis.map((r) => ({ value: r.id, label: r.nome }))}
+                />
               </div>
               <div className="field">
                 <label>Categoria</label>
-                <select
+                <Dropdown
+                  variant="field"
                   value={form.categoria}
-                  onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                >
-                  {CATEGORIAS.map((c) => (
-                    <option key={c.value} value={c.value}>{c.label}</option>
-                  ))}
-                </select>
+                  onChange={(v) => setForm({ ...form, categoria: v })}
+                  options={CATEGORIAS}
+                />
               </div>
             </div>
 
             <div className="detalhes-status-row">
               <span className="detalhes-status-label">Status</span>
-              <div className={`status-select-pill status-${form.status.toLowerCase()}`}>
-                {(() => {
-                  const Icon = STATUS_ICONS[form.status]
-                  return <Icon size={13} />
-                })()}
-                <select
-                  value={form.status}
-                  onChange={(e) => setForm({ ...form, status: e.target.value })}
-                >
-                  {STATUS.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                  ))}
-                </select>
-              </div>
+              <Dropdown
+                variant="pill"
+                className={`status-${form.status.toLowerCase()}`}
+                icon={STATUS_ICONS[form.status]}
+                value={form.status}
+                onChange={(v) => setForm({ ...form, status: v })}
+                options={STATUS}
+              />
             </div>
 
             <div className="detalhes-footer">

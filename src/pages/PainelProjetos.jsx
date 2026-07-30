@@ -2,13 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Search, X, SlidersHorizontal, ArrowUpDown, List, LayoutGrid,
-  Layers, Code2, CircleHelp, Wrench, Circle, User, Calendar, ChevronRight, Trash2
+  Layers, Code2, CircleHelp, Wrench, Circle, User, Calendar, ChevronRight, Trash2, Folder
 } from 'lucide-react'
 import { excluirProjeto, listarProjetos } from '../api/client'
 import { CATEGORIAS, STATUS, labelCategoria, labelStatus } from '../constants'
 import ConfirmModal from '../components/ConfirmModal.jsx'
 import { useToast } from '../components/ToastContext.jsx'
 import ProjetoDetalhesModal from '../components/ProjetoDetalhesModal.jsx'
+import Dropdown from '../components/Dropdown.jsx'
 
 const PAGE_SIZE = 8
 
@@ -126,14 +127,13 @@ export default function PainelProjetos() {
           <SlidersHorizontal size={16} />
         </button>
 
-        <div className="sort-control">
-          <ArrowUpDown size={14} />
-          <select value={sort} onChange={(e) => setSort(e.target.value)}>
-            {SORT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
+        <Dropdown
+          variant="sort"
+          icon={ArrowUpDown}
+          value={sort}
+          onChange={setSort}
+          options={SORT_OPTIONS}
+        />
 
         <div className="view-toggle">
           <button
@@ -214,12 +214,21 @@ export default function PainelProjetos() {
       {loading && <p className="empty-hint">Carregando projetos...</p>}
 
       {!loading && projetos.length === 0 && (
-        <div className="corner-frame empty-state">
-          <div className="empty-icon"><Search size={20} /></div>
-          <h3>Nenhum projeto encontrado</h3>
-          <p>Ajuste os filtros ou registre um novo projeto para visualizá-lo aqui.</p>
-          <Link className="btn btn-primary" to="/novo-projeto">Criar novo projeto</Link>
-        </div>
+        filtrosAtivos ? (
+          <div className="corner-frame empty-state">
+            <div className="empty-icon"><Search size={20} /></div>
+            <h3>Nenhum projeto encontrado</h3>
+            <p>Ajuste os filtros ou registre um novo projeto para visualizá-lo aqui.</p>
+            <Link className="btn btn-primary" to="/novo-projeto">Criar novo projeto</Link>
+          </div>
+        ) : (
+          <div className="corner-frame empty-state">
+            <div className="empty-icon"><Folder size={20} /></div>
+            <h3>Nenhum projeto cadastrado</h3>
+            <p>Registre o primeiro projeto para visualizá-lo aqui no painel.</p>
+            <Link className="btn btn-primary" to="/novo-projeto">Criar primeiro projeto</Link>
+          </div>
+        )
       )}
 
       {!loading && projetos.length > 0 && (

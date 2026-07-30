@@ -1,9 +1,9 @@
 export const CATEGORIAS = [
-  { value: 'INFRAESTRUTURA', label: 'Infraestrutura' },
-  { value: 'DESENVOLVIMENTO', label: 'Desenvolvimento' },
-  { value: 'SUPORTE', label: 'Suporte' },
-  { value: 'MANUTENCAO', label: 'Manutenção' },
-  { value: 'OUTROS', label: 'Outros' }
+  { value: 'INFRAESTRUTURA', label: 'Infraestrutura', descricaoCurta: 'Redes, servidores, cloud e hardware' },
+  { value: 'DESENVOLVIMENTO', label: 'Desenvolvimento', descricaoCurta: 'Sistemas, APIs, aplicações e automações' },
+  { value: 'SUPORTE', label: 'Suporte', descricaoCurta: 'Atendimento técnico e chamados internos' },
+  { value: 'MANUTENCAO', label: 'Manutenção', descricaoCurta: 'Correções, melhorias e atualizações' },
+  { value: 'OUTROS', label: 'Outros', descricaoCurta: 'Iniciativas que não se enquadram acima' }
 ]
 
 export const STATUS = [

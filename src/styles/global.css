@@ -55,8 +55,7 @@ input, textarea, select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* layout raiz */
@@ -117,6 +116,53 @@ input, textarea, select {
 
 .corner-frame:hover::before {
   opacity: 0.6;
+}
+
+/* estado vazio (nenhum projeto cadastrado / nenhum resultado encontrado)
+   -- antes não tinha estilo nenhum, então o alinhamento variava conforme
+   o conteúdo. Agora é sempre centralizado, com espaçamento consistente. */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-7) var(--space-5);
+}
+
+.empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state h3 {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  max-width: 360px;
+}
+
+.empty-state .btn {
+  margin-top: var(--space-3);
+}
+
+.empty-hint {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  padding: var(--space-5) 0;
+  text-align: center;
 }
 
 /* botões */
@@ -186,6 +232,9 @@ input, textarea, select {
 }
 
 .field label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11.5px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1673,5 +1722,499 @@ input, textarea, select {
 
   .topbar-link-active {
     color: var(--accent);
+  }
+}
+/* =========================================================
+   Dropdown customizado (substitui <select> nativo)
+   O menu aberto usa os tokens de tema escuro, diferente do
+   <select> nativo, que sempre abre com fundo claro do SO.
+========================================================= */
+.dropdown {
+  position: relative;
+  display: inline-flex;
+}
+
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dropdown-trigger-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-chevron {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.dropdown-open .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  min-width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+  animation: fade-in-up 0.12s ease both;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dropdown-option:hover {
+  background: var(--surface-hover);
+}
+
+.dropdown-option-active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* variante: seletor de ordenação (topo do painel de projetos) */
+.dropdown--sort {
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.dropdown--sort .dropdown-trigger {
+  padding: 10px 2px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dropdown--sort .dropdown-menu {
+  right: 0;
+  left: auto;
+  min-width: 170px;
+}
+
+/* variante: campo de formulário (título, descrição, responsável...) */
+.dropdown--field {
+  width: 100%;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dropdown--field .dropdown-trigger {
+  padding: 14px 16px;
+  font-size: 14.5px;
+}
+
+.dropdown--field:hover {
+  border-color: var(--border-strong);
+}
+
+.dropdown--field.dropdown-open {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.dropdown--field .dropdown-menu {
+  left: 0;
+  right: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+/* variante: pill de status (troca rápida na tela de detalhes) */
+.dropdown--pill {
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+.dropdown--pill .dropdown-chevron {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.dropdown--pill .dropdown-menu {
+  left: 0;
+  min-width: 170px;
+  font-weight: 500;
+}
+
+.dropdown--pill.status-planejado { color: var(--info); border-color: rgba(109,184,242,0.3); background: var(--info-soft); }
+.dropdown--pill.status-em_andamento { color: var(--accent); border-color: rgba(254,200,23,0.3); background: var(--accent-soft); }
+.dropdown--pill.status-concluido { color: var(--success); border-color: rgba(79,214,138,0.3); background: var(--success-soft); }
+.dropdown--pill.status-cancelado { color: var(--text-muted); border-color: var(--border-strong); background: rgba(255,255,255,0.03); }
+
+/* =========================================================
+   Wizard de Novo Projeto (4 etapas)
+========================================================= */
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  margin-top: var(--space-6);
+}
+
+.wizard-step-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.wizard-step-item:last-child {
+  flex: 0 0 auto;
+}
+
+.wizard-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.wizard-step-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  color: var(--text-muted);
+  font-size: 12.5px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.wizard-step-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.wizard-step-done {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #171200;
+}
+
+.wizard-step-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.wizard-step-label-active {
+  color: var(--text);
+}
+
+.wizard-step-label-done {
+  color: var(--accent);
+}
+
+.wizard-step-connector {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin: 0 var(--space-3);
+  transition: background 0.2s ease;
+}
+
+.wizard-step-connector-done {
+  background: var(--accent);
+}
+
+.wizard-progress {
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: var(--space-3);
+  overflow: hidden;
+}
+
+.wizard-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+
+.wizard-body {
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+}
+
+.wizard-step-heading {
+  margin-bottom: var(--space-5);
+}
+
+.wizard-step-heading h3 {
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.wizard-step-heading p {
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+.wizard-field-spaced {
+  margin-top: var(--space-4);
+}
+
+/* etapa 1: seleção de categoria */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.category-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  text-align: left;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.category-card:hover {
+  border-color: var(--border-strong);
+}
+
+.category-card-icon {
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.category-card strong {
+  font-size: 14.5px;
+}
+
+.category-card p {
+  color: var(--text-muted);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+.category-card-selected {
+  border-color: rgba(79, 214, 138, 0.4);
+  box-shadow: 0 0 0 3px var(--success-soft);
+  background: var(--success-soft);
+}
+
+.category-card-selected .category-card-icon {
+  color: var(--success);
+}
+
+.category-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--accent);
+  background: var(--surface);
+  border-radius: 50%;
+  display: flex;
+}
+
+/* etapa 2: título e descrição */
+.wizard-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  border-bottom: 2px solid var(--border-strong);
+  padding-bottom: 10px;
+}
+
+.wizard-title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.wizard-title-input:focus,
+.wizard-title-input:focus-visible {
+  outline: none;
+}
+
+.wizard-title-input::placeholder {
+  color: var(--text-faint);
+}
+
+.wizard-title-row:focus-within {
+  border-bottom-color: var(--accent);
+}
+
+.wizard-title-counter {
+  color: var(--text-faint);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.wizard-hint {
+  color: var(--text-faint);
+  font-size: 12.5px;
+  margin-top: 8px;
+}
+
+/* etapa 4: revisão */
+.wizard-preview-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  overflow: hidden;
+}
+
+.wizard-preview-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--success);
+}
+
+.wizard-preview-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.wizard-preview-categoria {
+  color: var(--success);
+  border-color: rgba(79, 214, 138, 0.3);
+  background: var(--success-soft);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.wizard-preview-title {
+  margin-bottom: var(--space-2);
+}
+
+.wizard-preview-desc {
+  color: var(--text-muted);
+  font-size: 13.5px;
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--border-strong);
+  margin-bottom: var(--space-4);
+}
+
+.wizard-preview-meta {
+  display: flex;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--text-faint);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.wizard-preview-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.wizard-edit-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.wizard-edit-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.wizard-edit-chip:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+/* navegação inferior */
+.wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-5);
+}
+
+@media (max-width: 720px) {
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wizard-step-label {
+    display: none;
+  }
+
+  .wizard-step-label-active {
+    display: inline;
   }
 }

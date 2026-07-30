@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { CATEGORIAS, STATUS } from '../constants'
 import { listarResponsaveis } from '../api/client'
+import Dropdown from './Dropdown.jsx'
 
 const EMPTY = {
   titulo: '',
@@ -83,45 +84,39 @@ export default function ProjetoForm({ initialValue, submitLabel, onSubmit, onCha
       <div className="form-row">
         <div className="field">
           <label htmlFor="responsavel">Responsável</label>
-          <select
+          <Dropdown
             id="responsavel"
+            variant="field"
+            placeholder="Selecione um responsável"
             value={values.responsavelId}
-            onChange={(e) => handleChange('responsavelId', e.target.value)}
-          >
-            <option value="">Selecione um responsável</option>
-            {responsaveis.map((r) => (
-              <option key={r.id} value={r.id}>{r.nome}</option>
-            ))}
-          </select>
+            onChange={(v) => handleChange('responsavelId', v)}
+            options={responsaveis.map((r) => ({ value: r.id, label: r.nome }))}
+          />
           {errors.responsavelId && <span className="field-error">{errors.responsavelId}</span>}
         </div>
 
         <div className="field">
           <label htmlFor="categoria">Categoria</label>
-          <select
+          <Dropdown
             id="categoria"
+            variant="field"
             value={values.categoria}
-            onChange={(e) => handleChange('categoria', e.target.value)}
-          >
-            {CATEGORIAS.map((c) => (
-              <option key={c.value} value={c.value}>{c.label}</option>
-            ))}
-          </select>
+            onChange={(v) => handleChange('categoria', v)}
+            options={CATEGORIAS}
+          />
         </div>
       </div>
 
       {isEdit && (
         <div className="field">
           <label htmlFor="status">Status</label>
-          <select
+          <Dropdown
             id="status"
+            variant="field"
             value={values.status}
-            onChange={(e) => handleChange('status', e.target.value)}
-          >
-            {STATUS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
+            onChange={(v) => handleChange('status', v)}
+            options={STATUS}
+          />
         </div>
       )}
 
