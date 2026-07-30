@@ -13,10 +13,21 @@ export const STATUS = [
   { value: 'CANCELADO', label: 'Cancelado' }
 ]
 
+export const CARGOS = [
+  { value: 'DIRETOR', label: 'Diretor' },
+  { value: 'VICE_DIRETOR', label: 'Vice-Diretor' },
+  { value: 'COORDENADOR', label: 'Coordenador' },
+  { value: 'ANALISTA', label: 'Analista' }
+]
+
 export function labelStatus(value) {
   return STATUS.find((s) => s.value === value)?.label || value
 }
 
 export function labelCategoria(value) {
   return CATEGORIAS.find((c) => c.value === value)?.label || value
+}
+
+export function labelCargo(value) {
+  return CARGOS.find((c) => c.value === value)?.label || value || 'Sem cargo'
 }

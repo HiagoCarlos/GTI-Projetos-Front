@@ -1,12 +1,16 @@
 import { NavLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import {
+  LayoutDashboard, FolderKanban, FolderPlus, Users,
+  Folder, Activity, CheckCircle2, UserRound, LogOut
+} from 'lucide-react'
 import { buscarDashboard } from '../api/client'
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Visão Geral', end: true },
-  { to: '/painel', label: 'Painel de Projetos' },
-  { to: '/novo-projeto', label: 'Novo Projeto' },
-  { to: '/responsaveis', label: 'Responsáveis' }
+  { to: '/', label: 'Visão Geral', end: true, icon: LayoutDashboard },
+  { to: '/painel', label: 'Painel de Projetos', icon: FolderKanban },
+  { to: '/novo-projeto', label: 'Novo Projeto', icon: FolderPlus },
+  { to: '/responsaveis', label: 'Responsáveis', icon: Users }
 ]
 
 export default function Topbar() {
@@ -29,47 +33,71 @@ export default function Topbar() {
             </div>
           </div>
 
-          {totais && (
-            <div className="topbar-stats">
-              <div className="topbar-stat">
-                <strong>{totais.totalProjetos}</strong>
-                <span>total</span>
+          <div className="topbar-row-right">
+            {totais && (
+              <div className="topbar-stats">
+                <div className="topbar-stat">
+                  <Folder size={13} />
+                  <strong>{totais.totalProjetos}</strong>
+                  <span>total</span>
+                </div>
+                <div className="topbar-stat">
+                  <Activity size={13} />
+                  <strong>{totais.porStatus?.EM_ANDAMENTO || 0}</strong>
+                  <span>ativos</span>
+                </div>
+                <div className="topbar-stat">
+                  <CheckCircle2 size={13} />
+                  <strong>{totais.porStatus?.CONCLUIDO || 0}</strong>
+                  <span>concluídos</span>
+                </div>
               </div>
-              <div className="topbar-stat">
-                <strong>{totais.porStatus?.EM_ANDAMENTO || 0}</strong>
-                <span>ativos</span>
-              </div>
-              <div className="topbar-stat">
-                <strong>{totais.porStatus?.CONCLUIDO || 0}</strong>
-                <span>concluídos</span>
-              </div>
-            </div>
-          )}
+            )}
 
-          <button
-            className="menu-toggle"
-            aria-label="Abrir menu"
-            aria-expanded={menuAberto}
-            onClick={() => setMenuAberto((v) => !v)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+            <div className="topbar-account">
+              <div className="user-badge">
+                <div className="user-avatar">
+                  <UserRound size={17} />
+                </div>
+                <div className="user-badge-text">
+                  <strong>Equipe GTI</strong>
+                  <span>Área interna</span>
+                </div>
+              </div>
+              <button className="topbar-logout" title="Sair" aria-label="Sair">
+                <LogOut size={16} />
+              </button>
+            </div>
+
+            <button
+              className="menu-toggle"
+              aria-label="Abrir menu"
+              aria-expanded={menuAberto}
+              onClick={() => setMenuAberto((v) => !v)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
         </div>
 
         <nav className={`topbar-nav${menuAberto ? ' topbar-nav-open' : ''}`}>
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              onClick={() => setMenuAberto(false)}
-              className={({ isActive }) => `topbar-link${isActive ? ' topbar-link-active' : ''}`}
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const Icone = item.icon
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                onClick={() => setMenuAberto(false)}
+                className={({ isActive }) => `topbar-link${isActive ? ' topbar-link-active' : ''}`}
+              >
+                <Icone size={16} />
+                {item.label}
+              </NavLink>
+            )
+          })}
         </nav>
       </div>
     </header>

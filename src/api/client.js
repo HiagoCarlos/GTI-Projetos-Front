@@ -53,6 +53,10 @@ export function criarResponsavel(payload) {
   return request('/responsaveis', { method: 'POST', body: JSON.stringify(payload) })
 }
 
+export function atualizarResponsavel(id, payload) {
+  return request(`/responsaveis/${id}`, { method: 'PUT', body: JSON.stringify(payload) })
+}
+
 export function excluirResponsavel(id) {
   return request(`/responsaveis/${id}`, { method: 'DELETE' })
 }
