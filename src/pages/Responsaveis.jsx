@@ -8,9 +8,6 @@ import ConfirmModal from '../components/ConfirmModal.jsx'
 import { useToast } from '../components/ToastContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { podeGerenciarResponsaveis } from '../permissoes.js'
-const { usuario } = useAuth()
-const podeGerenciar = podeGerenciarResponsaveis(usuario?.cargo)
-
 
 const CARGO_META = {
   DIRETOR: { icon: Crown, css: 'diretor' },
@@ -31,31 +28,38 @@ function corAvatar(nome) {
 
 export default function Responsaveis() {
   const { push } = useToast()
+  const { usuario } = useAuth()
+  const podeGerenciar = podeGerenciarResponsaveis(usuario?.cargo)
+
   const [responsaveis, setResponsaveis] = useState([])
   const [projetos, setProjetos] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [nome, setNome] = useState('')
   const [cargo, setCargo] = useState('')
+  const [login, setLogin] = useState('')
+  const [senha, setSenha] = useState('')
   const [saving, setSaving] = useState(false)
   const [busca, setBusca] = useState('')
   const [pendingDelete, setPendingDelete] = useState(null)
 
-function carregar() {
-  setCarregando(true)
-  Promise.all([listarResponsaveis(), listarProjetos({ size: 1000 }).catch(() => [])])
-    .then(([resp, proj]) => {
-      setResponsaveis(resp)
-      setProjetos(Array.isArray(proj) ? proj : proj?.content || [])
-    })
-    .catch((err) => push(err.message, 'error'))
-    .finally(() => setCarregando(false))
-}
+  function carregar() {
+    setCarregando(true)
+    Promise.all([listarResponsaveis(), listarProjetos({ size: 1000 }).catch(() => [])])
+      .then(([resp, proj]) => {
+        setResponsaveis(resp)
+        setProjetos(Array.isArray(proj) ? proj : proj?.content || [])
+      })
+      .catch((err) => push(err.message, 'error'))
+      .finally(() => setCarregando(false))
+  }
   useEffect(carregar, [])
 
   function limparFormulario() {
     setNome('')
     setCargo('')
+    setLogin('')
+    setSenha('')
   }
 
   function abrirFormulario() {
@@ -77,9 +81,17 @@ function carregar() {
       push('Selecione o cargo do responsável', 'error')
       return
     }
+    if (!login.trim()) {
+      push('Informe o login de acesso', 'error')
+      return
+    }
+    if (!senha || senha.length < 4) {
+      push('A senha deve ter ao menos 4 caracteres', 'error')
+      return
+    }
     setSaving(true)
     try {
-      await criarResponsavel({ nome: nome.trim(), cargo })
+      await criarResponsavel({ nome: nome.trim(), cargo, login: login.trim(), senha })
       push('Responsável cadastrado', 'success')
       cancelarFormulario()
       carregar()
@@ -133,17 +145,11 @@ function carregar() {
           <p>Equipe do GTI e seus cargos no sistema.</p>
         </div>
         {!showForm && podeGerenciar && (
-  <button className="btn btn-primary" onClick={abrirFormulario}>
-    <Plus size={16} /> Adicionar
-  </button>
-)}
-
+          <button className="btn btn-primary" onClick={abrirFormulario}>
+            <Plus size={16} /> Adicionar
+          </button>
+        )}
       </div>
-      {podeGerenciar && (
-  <button className="btn btn-icon" onClick={() => setPendingDelete(r)} title="Remover">
-    <Trash2 size={14} />
-  </button>
-)}
 
       {showForm && (
         <form className="corner-frame responsavel-form-card" onSubmit={handleSubmit}>
@@ -183,6 +189,31 @@ function carregar() {
             </div>
           </div>
 
+          <div className="form-row responsavel-form-row">
+            <div className="field">
+              <label htmlFor="login">Login</label>
+              <input
+                id="login"
+                placeholder="Ex: lucas.mendes"
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="senha">Senha</label>
+              <input
+                id="senha"
+                type="password"
+                placeholder="Mínimo 4 caracteres"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                autoComplete="new-password"
+              />
+            </div>
+          </div>
+
           <div className="responsavel-form-actions">
             <button type="button" className="btn btn-secondary" onClick={cancelarFormulario}>
               Cancelar
@@ -213,7 +244,6 @@ function carregar() {
       {!carregando && grupos.length === 0 && (
         <p className="empty-hint">Nenhum responsável encontrado.</p>
       )}
-      
 
       {grupos.map((grupo) => {
         const meta = grupo.cargo ? CARGO_META[grupo.cargo] : null
@@ -247,9 +277,11 @@ function carregar() {
                     <span className="responsavel-projeto-count">
                       {totalProjetos === 0 ? 'sem projetos' : `${totalProjetos} projeto${totalProjetos > 1 ? 's' : ''}`}
                     </span>
-                    <button className="btn btn-icon" onClick={() => setPendingDelete(r)} title="Remover">
-                      <Trash2 size={14} />
-                    </button>
+                    {podeGerenciar && (
+                      <button className="btn btn-icon" onClick={() => setPendingDelete(r)} title="Remover">
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 )
               })}
@@ -266,11 +298,7 @@ function carregar() {
           onConfirm={confirmarExclusao}
           onCancel={() => setPendingDelete(null)}
         />
-      )  }
-
-      
-      
+      )}
     </>
-    
   )
 }

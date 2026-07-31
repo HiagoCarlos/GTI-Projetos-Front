@@ -14,18 +14,6 @@ import { useAuth } from '../context/AuthContext.jsx'
 import { podeExcluir } from '../permissoes.js'
 
 const PAGE_SIZE = 8
-const { usuario } = useAuth()
-
-{podeExcluir(usuario?.cargo) && (
-  <button
-    className="btn btn-icon"
-    onClick={() => setPendingDelete(p)}
-    title="Excluir"
-    aria-label="Excluir projeto"
-  >
-    <Trash2 size={14} />
-  </button>
-)}
 
 const CATEGORIA_ICONS = {
   INFRAESTRUTURA: Layers,
@@ -43,6 +31,8 @@ const SORT_OPTIONS = [
 
 export default function PainelProjetos() {
   const { push } = useToast()
+  const { usuario } = useAuth()
+  const podeExcluirProjeto = podeExcluir(usuario?.cargo)
   const [projetos, setProjetos] = useState([])
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
@@ -273,14 +263,16 @@ export default function PainelProjetos() {
                 </div>
 
                 <div className="card-actions">
-                  <button
-                    className="btn btn-icon"
-                    onClick={() => setPendingDelete(p)}
-                    title="Excluir"
-                    aria-label="Excluir projeto"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {podeExcluirProjeto && (
+                    <button
+                      className="btn btn-icon"
+                      onClick={() => setPendingDelete(p)}
+                      title="Excluir"
+                      aria-label="Excluir projeto"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                   <button className="card-details" onClick={() => setDetalhesId(p.id)}>
                  Detalhes <ChevronRight size={14} />
                   </button>

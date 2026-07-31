@@ -4,47 +4,12 @@ import {
   Layers, Code2, CircleHelp, Wrench, Circle
 } from 'lucide-react'
 import { atualizarProjeto, buscarProjeto, excluirProjeto, listarResponsaveis } from '../api/client'
-import { CATEGORIAS, STATUS, labelCategoria } from '../constants'
+import { CATEGORIAS, STATUS, labelCategoria, labelStatus } from '../constants'
 import ConfirmModal from './ConfirmModal.jsx'
 import Dropdown from './Dropdown.jsx'
 import { useToast } from './ToastContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { podeEditar, podeExcluir } from '../permissoes.js'
-
-const { usuario } = useAuth()
-const podeEditarProjeto = podeEditar(usuario?.cargo)
-const podeExcluirProjeto = podeExcluir(usuario?.cargo)
-
-{mode === 'view' && podeEditarProjeto && (
-  <button className="detalhes-icon-btn" onClick={iniciarEdicao} title="Editar">
-    <Pencil size={14} /> Editar
-  </button>
-)}
-
-{mode === 'view' && podeEditarProjeto && (
-  <button className="detalhes-icon-btn" onClick={iniciarEdicao} title="Editar">
-    <Pencil size={14} /> Editar
-  </button>
-)}
-
-<div className="detalhes-status-row">
-  <span className="detalhes-status-label">Status atual</span>
-  {podeEditarProjeto ? (
-    <Dropdown
-      variant="pill"
-      className={`status-${projeto.status.toLowerCase()}`}
-      icon={StatusIcon}
-      value={projeto.status}
-      onChange={handleStatusRapido}
-      options={STATUS}
-    />
-  ) : (
-    <span className={`status-badge status-${projeto.status.toLowerCase()}`}>
-      <span className="dot" />
-      {labelStatus(projeto.status)}
-    </span>
-  )}
-</div>
 
 const CATEGORIA_ICONS = {
   INFRAESTRUTURA: Layers,
@@ -63,12 +28,16 @@ const STATUS_ICONS = {
 
 export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) {
   const { push } = useToast()
+  const { usuario } = useAuth()
   const [projeto, setProjeto] = useState(null)
   const [responsaveis, setResponsaveis] = useState([])
   const [mode, setMode] = useState('view')
   const [form, setForm] = useState(null)
   const [saving, setSaving] = useState(false)
   const [pendingDelete, setPendingDelete] = useState(false)
+
+  const podeEditarProjeto = podeEditar(usuario?.cargo)
+  const podeExcluirProjeto = podeExcluir(usuario?.cargo)
 
   useEffect(() => {
     buscarProjeto(projetoId).then(setProjeto).catch((err) => push(err.message, 'error'))
@@ -145,7 +114,7 @@ export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) 
             <Folder size={13} /> {mode === 'view' ? 'DETALHES DO PROJETO' : 'EDITAR PROJETO'}
           </span>
           <div className="detalhes-header-actions">
-            {mode === 'view' && (
+            {mode === 'view' && podeEditarProjeto && (
               <button className="detalhes-icon-btn" onClick={iniciarEdicao} title="Editar">
                 <Pencil size={14} /> Editar
               </button>
@@ -170,14 +139,21 @@ export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) 
 
             <div className="detalhes-status-row">
               <span className="detalhes-status-label">Status atual</span>
-              <Dropdown
-                variant="pill"
-                className={`status-${projeto.status.toLowerCase()}`}
-                icon={StatusIcon}
-                value={projeto.status}
-                onChange={handleStatusRapido}
-                options={STATUS}
-              />
+              {podeEditarProjeto ? (
+                <Dropdown
+                  variant="pill"
+                  className={`status-${projeto.status.toLowerCase()}`}
+                  icon={StatusIcon}
+                  value={projeto.status}
+                  onChange={handleStatusRapido}
+                  options={STATUS}
+                />
+              ) : (
+                <span className={`status-badge status-${projeto.status.toLowerCase()}`}>
+                  <span className="dot" />
+                  {labelStatus(projeto.status)}
+                </span>
+              )}
             </div>
 
             <div className="detalhes-block">
@@ -199,12 +175,16 @@ export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) 
             <div className="detalhes-id">#{projeto.id}</div>
 
             <div className="detalhes-footer">
-              <button className="btn btn-danger" onClick={() => setPendingDelete(true)}>
-                Excluir
-              </button>
-              <button className="btn btn-primary" onClick={iniciarEdicao}>
-                <Pencil size={14} /> Editar projeto
-              </button>
+              {podeExcluirProjeto ? (
+                <button className="btn btn-danger" onClick={() => setPendingDelete(true)}>
+                  Excluir
+                </button>
+              ) : <span />}
+              {podeEditarProjeto && (
+                <button className="btn btn-primary" onClick={iniciarEdicao}>
+                  <Pencil size={14} /> Editar projeto
+                </button>
+              )}
             </div>
           </>
         )}
@@ -287,20 +267,8 @@ export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) 
     </div>
   )
 }
-<div className="detalhes-footer">
-  {podeExcluirProjeto ? (
-    <button className="btn btn-danger" onClick={() => setPendingDelete(true)}>
-      Excluir
-    </button>
-  ) : <span />}
-  {podeEditarProjeto && (
-    <button className="btn btn-primary" onClick={iniciarEdicao}>
-      <Pencil size={14} /> Editar projeto
-    </button>
-  )}
-</div>
 
 function formatarDataLonga(iso) {
   if (!iso) return ''
   return new Date(iso).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })
-}           
+}

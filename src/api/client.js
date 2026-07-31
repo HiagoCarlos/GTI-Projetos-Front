@@ -1,9 +1,27 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
 
+const TOKEN_KEY = 'gti_token'
+
+let token = localStorage.getItem(TOKEN_KEY) || null
+
+export function setToken(novoToken) {
+  token = novoToken
+  if (novoToken) {
+    localStorage.setItem(TOKEN_KEY, novoToken)
+  } else {
+    localStorage.removeItem(TOKEN_KEY)
+  }
+}
+
 async function request(path, options = {}) {
+  const headers = { 'Content-Type': 'application/json', ...options.headers }
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
   const response = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options
+    ...options,
+    headers
   })
 
   if (response.status === 204) {
@@ -18,6 +36,14 @@ async function request(path, options = {}) {
   }
 
   return data
+}
+
+// ---- Auth ----
+export function login(loginUsuario, senha) {
+  return request('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ login: loginUsuario, senha })
+  })
 }
 
 // ---- Projetos ----

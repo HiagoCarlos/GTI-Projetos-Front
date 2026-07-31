@@ -1,14 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-
-// Usuários de teste -- enquanto não existe endpoint de autenticação na API,
-// o login valida contra essa lista local. Trocar por chamada real
-// (ex: POST /api/auth/login) quando o back-end tiver esse endpoint.
-const MOCK_USUARIOS = [
-  { id: 'diretor', senha: '1234', nome: 'Ana Diretora', cargo: 'DIRETOR' },
-  { id: 'vice', senha: '1234', nome: 'Bruno Vice', cargo: 'VICE_DIRETOR' },
-  { id: 'coordenador', senha: '1234', nome: 'Carla Coordenadora', cargo: 'COORDENADOR' },
-  { id: 'analista', senha: '1234', nome: 'Diego Analista', cargo: 'ANALISTA' }
-]
+import { login as apiLogin, setToken } from '../api/client.js'
 
 const STORAGE_KEY = 'gti_usuario'
 
@@ -28,15 +19,14 @@ export function AuthProvider({ children }) {
     }
   }, [usuario])
 
-  function login(id, senha) {
-    const encontrado = MOCK_USUARIOS.find((u) => u.id === id && u.senha === senha)
-    if (!encontrado) {
-      throw new Error('ID ou senha inválidos')
-    }
-    setUsuario({ nome: encontrado.nome, cargo: encontrado.cargo })
+  async function login(id, senha) {
+    const resposta = await apiLogin(id, senha)
+    setToken(resposta.token)
+    setUsuario({ nome: resposta.nome, cargo: resposta.cargo })
   }
 
   function logout() {
+    setToken(null)
     setUsuario(null)
   }
 

@@ -12,11 +12,11 @@ export default function Login() {
   const [senha, setSenha] = useState('')
   const [entrando, setEntrando] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setEntrando(true)
     try {
-      login(usuario, senha)
+      await login(usuario, senha)
       navigate('/', { replace: true })
     } catch (err) {
       push(err.message, 'error')
