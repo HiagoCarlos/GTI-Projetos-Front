@@ -1,13 +1,28 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Terminal, ArrowRight } from 'lucide-react'
+import { useAuth } from '../context/AuthContext.jsx'
+import { useToast } from '../components/ToastContext.jsx'
 
 export default function Login() {
+  const { login } = useAuth()
+  const { push } = useToast()
+  const navigate = useNavigate()
   const [usuario, setUsuario] = useState('')
   const [senha, setSenha] = useState('')
+  const [entrando, setEntrando] = useState(false)
 
   function handleSubmit(e) {
     e.preventDefault()
-    // Autenticação real ainda não implementada.
+    setEntrando(true)
+    try {
+      login(usuario, senha)
+      navigate('/', { replace: true })
+    } catch (err) {
+      push(err.message, 'error')
+    } finally {
+      setEntrando(false)
+    }
   }
 
   return (
@@ -37,8 +52,8 @@ export default function Login() {
           />
         </div>
 
-        <button className="btn btn-primary login-submit" type="submit">
-          Autenticar <ArrowRight size={16} />
+        <button className="btn btn-primary login-submit" type="submit" disabled={entrando}>
+          {entrando ? 'Entrando...' : 'Autenticar'} <ArrowRight size={16} />
         </button>
       </form>
     </div>

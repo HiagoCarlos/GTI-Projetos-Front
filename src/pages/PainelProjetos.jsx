@@ -10,8 +10,22 @@ import ConfirmModal from '../components/ConfirmModal.jsx'
 import { useToast } from '../components/ToastContext.jsx'
 import ProjetoDetalhesModal from '../components/ProjetoDetalhesModal.jsx'
 import Dropdown from '../components/Dropdown.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { podeExcluir } from '../permissoes.js'
 
 const PAGE_SIZE = 8
+const { usuario } = useAuth()
+
+{podeExcluir(usuario?.cargo) && (
+  <button
+    className="btn btn-icon"
+    onClick={() => setPendingDelete(p)}
+    title="Excluir"
+    aria-label="Excluir projeto"
+  >
+    <Trash2 size={14} />
+  </button>
+)}
 
 const CATEGORIA_ICONS = {
   INFRAESTRUTURA: Layers,

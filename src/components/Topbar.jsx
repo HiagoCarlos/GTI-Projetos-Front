@@ -1,25 +1,36 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, FolderKanban, FolderPlus, Users,
   Folder, Activity, CheckCircle2, UserRound, LogOut
 } from 'lucide-react'
 import { buscarDashboard } from '../api/client'
+import { useAuth } from '../context/AuthContext.jsx'
+import { podeCriar, labelCargo } from '../permissoes.js'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Visão Geral', end: true, icon: LayoutDashboard },
   { to: '/painel', label: 'Painel de Projetos', icon: FolderKanban },
-  { to: '/novo-projeto', label: 'Novo Projeto', icon: FolderPlus },
+  { to: '/novo-projeto', label: 'Novo Projeto', icon: FolderPlus, exigir: podeCriar },
   { to: '/responsaveis', label: 'Responsáveis', icon: Users }
 ]
 
 export default function Topbar() {
   const [totais, setTotais] = useState(null)
   const [menuAberto, setMenuAberto] = useState(false)
+  const { usuario, logout } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     buscarDashboard().then(setTotais).catch(() => {})
   }, [])
+
+  function handleLogout() {
+    logout()
+    navigate('/login', { replace: true })
+  }
+
+  const itensVisiveis = NAV_ITEMS.filter((item) => !item.exigir || item.exigir(usuario?.cargo))
 
   return (
     <header className="topbar">
@@ -37,13 +48,19 @@ export default function Topbar() {
             {totais && (
               <div className="topbar-stats">
                 <div className="topbar-stat">
-                 
+                  <Folder size={13} />
+                  <strong>{totais.totalProjetos}</strong>
+                  <span>total</span>
                 </div>
                 <div className="topbar-stat">
-                  
+                  <Activity size={13} />
+                  <strong>{totais.porStatus?.EM_ANDAMENTO || 0}</strong>
+                  <span>ativos</span>
                 </div>
                 <div className="topbar-stat">
-                  
+                  <CheckCircle2 size={13} />
+                  <strong>{totais.porStatus?.CONCLUIDO || 0}</strong>
+                  <span>concluídos</span>
                 </div>
               </div>
             )}
@@ -54,11 +71,11 @@ export default function Topbar() {
                   <UserRound size={17} />
                 </div>
                 <div className="user-badge-text">
-                  <strong>Equipe GTI</strong>
-                  <span>Área interna</span>
+                  <strong>{usuario?.nome || 'Visitante'}</strong>
+                  <span>{usuario ? labelCargo(usuario.cargo) : ''}</span>
                 </div>
               </div>
-              <button className="topbar-logout" title="Sair" aria-label="Sair">
+              <button className="topbar-logout" title="Sair" aria-label="Sair" onClick={handleLogout}>
                 <LogOut size={16} />
               </button>
             </div>
@@ -77,7 +94,7 @@ export default function Topbar() {
         </div>
 
         <nav className={`topbar-nav${menuAberto ? ' topbar-nav-open' : ''}`}>
-          {NAV_ITEMS.map((item) => {
+          {itensVisiveis.map((item) => {
             const Icone = item.icon
             return (
               <NavLink

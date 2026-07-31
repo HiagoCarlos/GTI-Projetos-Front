@@ -8,6 +8,43 @@ import { CATEGORIAS, STATUS, labelCategoria } from '../constants'
 import ConfirmModal from './ConfirmModal.jsx'
 import Dropdown from './Dropdown.jsx'
 import { useToast } from './ToastContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { podeEditar, podeExcluir } from '../permissoes.js'
+
+const { usuario } = useAuth()
+const podeEditarProjeto = podeEditar(usuario?.cargo)
+const podeExcluirProjeto = podeExcluir(usuario?.cargo)
+
+{mode === 'view' && podeEditarProjeto && (
+  <button className="detalhes-icon-btn" onClick={iniciarEdicao} title="Editar">
+    <Pencil size={14} /> Editar
+  </button>
+)}
+
+{mode === 'view' && podeEditarProjeto && (
+  <button className="detalhes-icon-btn" onClick={iniciarEdicao} title="Editar">
+    <Pencil size={14} /> Editar
+  </button>
+)}
+
+<div className="detalhes-status-row">
+  <span className="detalhes-status-label">Status atual</span>
+  {podeEditarProjeto ? (
+    <Dropdown
+      variant="pill"
+      className={`status-${projeto.status.toLowerCase()}`}
+      icon={StatusIcon}
+      value={projeto.status}
+      onChange={handleStatusRapido}
+      options={STATUS}
+    />
+  ) : (
+    <span className={`status-badge status-${projeto.status.toLowerCase()}`}>
+      <span className="dot" />
+      {labelStatus(projeto.status)}
+    </span>
+  )}
+</div>
 
 const CATEGORIA_ICONS = {
   INFRAESTRUTURA: Layers,
@@ -250,6 +287,18 @@ export default function ProjetoDetalhesModal({ projetoId, onClose, onChanged }) 
     </div>
   )
 }
+<div className="detalhes-footer">
+  {podeExcluirProjeto ? (
+    <button className="btn btn-danger" onClick={() => setPendingDelete(true)}>
+      Excluir
+    </button>
+  ) : <span />}
+  {podeEditarProjeto && (
+    <button className="btn btn-primary" onClick={iniciarEdicao}>
+      <Pencil size={14} /> Editar projeto
+    </button>
+  )}
+</div>
 
 function formatarDataLonga(iso) {
   if (!iso) return ''

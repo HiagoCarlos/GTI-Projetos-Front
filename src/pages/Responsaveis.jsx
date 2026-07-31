@@ -6,6 +6,11 @@ import { criarResponsavel, excluirResponsavel, listarProjetos, listarResponsavei
 import { CARGOS, labelCargo } from '../constants'
 import ConfirmModal from '../components/ConfirmModal.jsx'
 import { useToast } from '../components/ToastContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
+import { podeGerenciarResponsaveis } from '../permissoes.js'
+const { usuario } = useAuth()
+const podeGerenciar = podeGerenciarResponsaveis(usuario?.cargo)
+
 
 const CARGO_META = {
   DIRETOR: { icon: Crown, css: 'diretor' },
@@ -127,12 +132,18 @@ function carregar() {
           <h1>Responsáveis</h1>
           <p>Equipe do GTI e seus cargos no sistema.</p>
         </div>
-        {!showForm && (
-          <button className="btn btn-primary" onClick={abrirFormulario}>
-            <Plus size={16} /> Adicionar
-          </button>
-        )}
+        {!showForm && podeGerenciar && (
+  <button className="btn btn-primary" onClick={abrirFormulario}>
+    <Plus size={16} /> Adicionar
+  </button>
+)}
+
       </div>
+      {podeGerenciar && (
+  <button className="btn btn-icon" onClick={() => setPendingDelete(r)} title="Remover">
+    <Trash2 size={14} />
+  </button>
+)}
 
       {showForm && (
         <form className="corner-frame responsavel-form-card" onSubmit={handleSubmit}>
@@ -202,6 +213,7 @@ function carregar() {
       {!carregando && grupos.length === 0 && (
         <p className="empty-hint">Nenhum responsável encontrado.</p>
       )}
+      
 
       {grupos.map((grupo) => {
         const meta = grupo.cargo ? CARGO_META[grupo.cargo] : null
@@ -254,7 +266,11 @@ function carregar() {
           onConfirm={confirmarExclusao}
           onCancel={() => setPendingDelete(null)}
         />
-      )}
+      )  }
+
+      
+      
     </>
+    
   )
 }
