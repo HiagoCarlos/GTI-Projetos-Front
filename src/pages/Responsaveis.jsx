@@ -140,7 +140,7 @@ function carregar() {
 
           <div className="form-row responsavel-form-row">
             <div className="field">
-              <label htmlFor="nome">Nome completo</label>
+              <label htmlFor="nome">Nickname:</label>
               <input
                 id="nome"
                 placeholder="Ex: Lucas Mendes"
