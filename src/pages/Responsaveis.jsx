@@ -108,10 +108,10 @@ export default function Responsaveis() {
       push('Responsável removido', 'success')
       setPendingDelete(null)
       carregar()
-    } catch (err) {
-      push('Não é possível remover: responsável vinculado a projetos', 'error')
-      setPendingDelete(null)
-    }
+    }  catch (err) {
+  push(err.message, 'error')
+  setPendingDelete(null)
+}
   }
 
   function contarProjetos(responsavelId) {

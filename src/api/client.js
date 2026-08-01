@@ -27,10 +27,13 @@ async function request(path, options = {}) {
   const data = await response.json().catch(() => null)
 
   if (!response.ok) {
-    const message = data?.mensagem || data?.message || 'Erro ao comunicar com a API'
-    throw new Error(message)
-  }
-
+  const message =
+    data?.mensagem ||
+    data?.message ||
+    (data && typeof data === 'object' ? Object.values(data)[0] : null) ||
+    'Erro ao comunicar com a API'
+  throw new Error(message)
+}
   return data
 }
 
