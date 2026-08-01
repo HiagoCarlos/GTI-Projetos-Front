@@ -48,19 +48,13 @@ export default function Topbar() {
             {totais && (
               <div className="topbar-stats">
                 <div className="topbar-stat">
-                  <Folder size={13} />
-                  <strong>{totais.totalProjetos}</strong>
-                  <span>total</span>
+                  
                 </div>
                 <div className="topbar-stat">
-                  <Activity size={13} />
-                  <strong>{totais.porStatus?.EM_ANDAMENTO || 0}</strong>
-                  <span>ativos</span>
+                 
                 </div>
                 <div className="topbar-stat">
-                  <CheckCircle2 size={13} />
-                  <strong>{totais.porStatus?.CONCLUIDO || 0}</strong>
-                  <span>concluídos</span>
+                 
                 </div>
               </div>
             )}

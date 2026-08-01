@@ -32,7 +32,6 @@ const SORT_OPTIONS = [
 export default function PainelProjetos() {
   const { push } = useToast()
   const { usuario } = useAuth()
-  const podeExcluirProjeto = podeExcluir(usuario?.cargo)
   const [projetos, setProjetos] = useState([])
   const [totalPages, setTotalPages] = useState(0)
   const [totalElements, setTotalElements] = useState(0)
@@ -241,29 +240,31 @@ export default function PainelProjetos() {
             const CategoriaIcon = CATEGORIA_ICONS[p.categoria]
             return (
               <div key={p.id} className="corner-frame projeto-card-v2">
-                <span className={`card-dot dot-${p.status.toLowerCase()}`} />
+                <span className={`card-accent dot-${p.status.toLowerCase()}`} />
                 <div className="card-body">
-                  <h3 className="card-title" title={p.titulo}>{p.titulo}</h3>
-                  {p.descricao && <p className="card-desc">{p.descricao}</p>}
-
-                  <div className="card-tags">
-                    <span className="tag-pill">
-                      <CategoriaIcon size={13} /> {labelCategoria(p.categoria)}
-                    </span>
+                  <div className="card-header">
+                    <h3 className="card-title" title={p.titulo}>{p.titulo}</h3>
                     <span className={`status-badge status-${p.status.toLowerCase()}`}>
                       <span className="dot" />
                       {labelStatus(p.status)}
                     </span>
                   </div>
 
-                  <div className="card-meta">
-                    <span><User size={12} /> {p.responsavelNome}</span>
-                    <span><Calendar size={12} /> {formatarData(p.dataCriacao)}</span>
+                  {p.descricao && <p className="card-desc">{p.descricao}</p>}
+
+                  <div className="card-footer-row">
+                    <div className="card-tags">
+                      <span className="tag-pill">
+                        <CategoriaIcon size={13} /> {labelCategoria(p.categoria)}
+                      </span>
+                      <span className="card-meta-inline"><User size={12} /> {p.responsavelNome}</span>
+                      <span className="card-meta-inline"><Calendar size={12} /> {formatarData(p.dataCriacao)}</span>
+                    </div>
                   </div>
                 </div>
 
                 <div className="card-actions">
-                  {podeExcluirProjeto && (
+                  {podeExcluir(usuario?.cargo) && (
                     <button
                       className="btn btn-icon"
                       onClick={() => setPendingDelete(p)}
@@ -274,7 +275,7 @@ export default function PainelProjetos() {
                     </button>
                   )}
                   <button className="card-details" onClick={() => setDetalhesId(p.id)}>
-                 Detalhes <ChevronRight size={14} />
+                    Detalhes <ChevronRight size={14} />
                   </button>
                 </div>
               </div>
@@ -302,17 +303,15 @@ export default function PainelProjetos() {
           confirmLabel="Excluir"
           onConfirm={confirmarExclusao}
           onCancel={() => setPendingDelete(null)}
-
-          
         />
       )}
       {detalhesId && (
-  <ProjetoDetalhesModal
-    projetoId={detalhesId}
-    onClose={() => setDetalhesId(null)}
-    onChanged={carregar}
-  />
-)}
+        <ProjetoDetalhesModal
+          projetoId={detalhesId}
+          onClose={() => setDetalhesId(null)}
+          onChanged={carregar}
+        />
+      )}
     </>
   )
 }
