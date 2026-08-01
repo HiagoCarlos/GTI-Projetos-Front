@@ -1,28 +1,24 @@
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api'
-
 const TOKEN_KEY = 'gti_token'
-
-let token = localStorage.getItem(TOKEN_KEY) || null
-
-export function setToken(novoToken) {
-  token = novoToken
-  if (novoToken) {
-    localStorage.setItem(TOKEN_KEY, novoToken)
-  } else {
-    localStorage.removeItem(TOKEN_KEY)
-  }
-}
+const USUARIO_KEY = 'gti_usuario'
 
 async function request(path, options = {}) {
-  const headers = { 'Content-Type': 'application/json', ...options.headers }
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
+  const token = localStorage.getItem(TOKEN_KEY)
 
   const response = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    ...options
   })
+
+  if (response.status === 401 && !path.startsWith('/auth')) {
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(USUARIO_KEY)
+    window.location.href = '/login'
+    return null
+  }
 
   if (response.status === 204) {
     return null
@@ -38,12 +34,9 @@ async function request(path, options = {}) {
   return data
 }
 
-// ---- Auth ----
-export function login(loginUsuario, senha) {
-  return request('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ login: loginUsuario, senha })
-  })
+// ---- Autenticação ----
+export function autenticar(login, senha) {
+  return request('/auth/login', { method: 'POST', body: JSON.stringify({ login, senha }) })
 }
 
 // ---- Projetos ----

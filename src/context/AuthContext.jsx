@@ -1,32 +1,33 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { login as apiLogin, setToken } from '../api/client.js'
+import { autenticar } from '../api/client'
 
-const STORAGE_KEY = 'gti_usuario'
+const TOKEN_KEY = 'gti_token'
+const USUARIO_KEY = 'gti_usuario'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(() => {
-    const salvo = localStorage.getItem(STORAGE_KEY)
+    const salvo = localStorage.getItem(USUARIO_KEY)
     return salvo ? JSON.parse(salvo) : null
   })
 
   useEffect(() => {
     if (usuario) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(usuario))
+      localStorage.setItem(USUARIO_KEY, JSON.stringify(usuario))
     } else {
-      localStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(USUARIO_KEY)
     }
   }, [usuario])
 
   async function login(id, senha) {
-    const resposta = await apiLogin(id, senha)
-    setToken(resposta.token)
-    setUsuario({ nome: resposta.nome, cargo: resposta.cargo })
+    const data = await autenticar(id, senha)
+    localStorage.setItem(TOKEN_KEY, data.token)
+    setUsuario({ nome: data.nome, cargo: data.cargo })
   }
 
   function logout() {
-    setToken(null)
+    localStorage.removeItem(TOKEN_KEY)
     setUsuario(null)
   }
 
