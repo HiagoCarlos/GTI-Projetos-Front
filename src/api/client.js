@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://registroprojetos-api.onrender.com'
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://registroprojetos-api.onrender.com/api'
 const TOKEN_KEY = 'gti_token'
 const USUARIO_KEY = 'gti_usuario'
 
